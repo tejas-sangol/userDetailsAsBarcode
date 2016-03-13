@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>barcodeInvestigation</title>
+		<script type="text/javascript" src = "jquery-2.2.1.min.js"></script>
+		
+	</head>
+	<body>
+		<form>
+			<label for = "name" >Name</label>
+			<input type = "text" id = "name" > </input> <br/>
+			<label for = "mobileNo" >Mobile No </label>
+			<input type = "text" id = "mobileNo"> </input><br/>
+			<label for = "email" >Email</label>
+			<input type = "email" id = "email" value = "f2014774@goa.bits-pilani.ac.in"> </input><br/>
+			<label for = "college" >College</label>
+			<input type = "text" id = "college"> </input><br/>
+		</form>
+
+		<div>
+			<button id = "generateBarcode"> Generate </button>
+		</div>
+		<script>
+		var encrypt = require('./hash.js');
+		var barcodeDb = require('./database.js');
+		var sendMail = require('./mail.js')
+			
+   $('#generateBarcode').click(function(event)
+   {
+   		event.preventDefault();
+
+   		var name = $('#name').val();
+   		var mobileNo = $('#mobileNo').val();
+   		var email = $('#email').val();
+   		var college = $('#college').val();
+   		var hash = encrypt.createHash(name,mobileNo,email,college);
+
+   		encrypt.generateBarcode(email,hash,function(error)
+   		{
+   			if(error)
+   			{
+   				console.log("COMMMAND PROMPT ERROR----------------------------------------\n");
+   				console.log(error);
+   				console.log("--------------------------------------------------------------------------------\n");
+   				return;
+   			}
+
+   			barcodeDb.insert(name,mobileNo,email,college,hash,function(err,user)
+	   		{
+	   			if(err) 
+	   				{
+	   					console.log("Database insertion failed");
+						return;
+	   				}
+
+	   		});
+   		});
+
+   		
+   });
+   		
+		</script>
+	</body>
+</html>
